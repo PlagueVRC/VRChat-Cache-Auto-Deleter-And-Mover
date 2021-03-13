@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Security.Principal;
 using System.Windows.Forms;
 
@@ -109,7 +110,15 @@ namespace VRChat_Cache_Auto_Deleter
 
         private void AutoDeleteTimer_Tick(object sender, EventArgs e)
         {
-            ClearVRCCache();
+            var Drive = DriveInfo.GetDrives().First(o => o.Name == @"C:\");
+
+            if (Drive != null)
+            {
+                if (Drive.AvailableSpaceInGB() == 5 || (Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)) + "\\LocalLow\\VRChat\\").GetDirectorySizeInGB() > 19) // Drive Space Is Less Than 5GB Or Cache Is Full
+                {
+                    ClearVRCCache();
+                }
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -169,7 +178,10 @@ namespace VRChat_Cache_Auto_Deleter
         public static void CopyFolder(string sourceFolder, string destFolder)
         {
             if (!Directory.Exists(destFolder))
+            {
                 Directory.CreateDirectory(destFolder);
+            }
+
             string[] files = Directory.GetFiles(sourceFolder);
             foreach (string file in files)
             {
@@ -246,12 +258,41 @@ namespace VRChat_Cache_Auto_Deleter
     {
         public static long AvailableSpaceInMB(this DriveInfo drive)
         {
-            return ((drive.TotalSize - drive.AvailableFreeSpace) / 1073741824);
+            return (drive.AvailableFreeSpace / 1048576);
         }
 
         public static long AvailableSpaceInGB(this DriveInfo drive)
         {
-            return ((drive.TotalSize - drive.AvailableFreeSpace) / 1048576);
+            return (drive.AvailableFreeSpace / 1073741824);
+        }
+
+        public static long GetDirectorySizeInGB(this string Dir)
+        {
+            return GetDirectorySize(Dir) / 1073741824;
+        }
+
+        public static long GetDirectorySize(this string Dir)
+        {
+            var Info = new DirectoryInfo(Dir);
+
+            var startDirectorySize = default(long);
+
+            if (Info == null || !Info.Exists)
+            {
+                return startDirectorySize; //Return 0 while Directory does not exist.
+            }
+
+            //Add size of files in the Current Directory to main size.
+            foreach (var fileInfo in Info.GetFiles())
+            {
+                System.Threading.Interlocked.Add(ref startDirectorySize, fileInfo.Length);
+            }
+
+            //Loop on Sub Direcotries in the Current Directory and Calculate it's files size.
+            System.Threading.Tasks.Parallel.ForEach(Info.GetDirectories(), (subDirectory) =>
+                    System.Threading.Interlocked.Add(ref startDirectorySize, GetDirectorySizeInGB(subDirectory, recursive)));
+
+            return startDirectorySize;  //Return full Size of this Directory.
         }
     }
 }
