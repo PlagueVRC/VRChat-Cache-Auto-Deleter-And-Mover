@@ -14,20 +14,15 @@ namespace VRChat_Cache_Auto_Deleter
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            if (checkBox1.Checked && IsAdministrator() == true)
+            if (checkBox1.Checked)
             {
                 AutoDeleteTimer.Enabled = true;
                 AutoDeleteTimer.Start();
             }
-            else if (IsAdministrator() == true)
+            else
             {
                 AutoDeleteTimer.Stop();
                 AutoDeleteTimer.Enabled = false;
-            }
-            else if (checkBox1.Checked && IsAdministrator() == false)
-            {
-                checkBox1.Checked = false;
-                MessageBox.Show("This Tool MUST Be Ran As Administrator To Work!");
             }
         }
 
@@ -38,39 +33,83 @@ namespace VRChat_Cache_Auto_Deleter
             return principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
 
-        private void AutoDeleteTimer_Tick(object sender, EventArgs e)
+        /// <summary>
+        /// Clears VRChat's Cache
+        /// </summary>
+        public void ClearVRCCache()
         {
             if (Directory.Exists(Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)) + "\\LocalLow\\VRChat\\"))
             {
-                foreach (DriveInfo drive in DriveInfo.GetDrives())
+                foreach (var folder in Directory.GetDirectories(
+                                Directory.GetParent(
+                                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)) +
+                                "\\LocalLow\\VRChat\\vrchat\\"))
                 {
-                    if (drive.Name == @"C:\")
+                    var DirInfo = new DirectoryInfo(folder);
+
+                    switch (DirInfo.Name)
                     {
-                        if (drive.AvailableFreeSpace <= 5368709120)
-                        {
-                            if (Directory.Exists(Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)) + "\\LocalLow\\VRChat\\vrchat\\Cookies"))
+                        default:
+                            MessageBox.Show(DirInfo.Name);
+                            break;
+                        case "Cookies":
+                            try
                             {
-                                Directory.Delete(Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)) + "\\LocalLow\\VRChat\\vrchat\\Cookies", true);
+                                Directory.Delete(folder, true);
                             }
+                            catch
+                            {
 
-                            if (Directory.Exists(Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)) + "\\LocalLow\\VRChat\\vrchat\\HTTPCache-WindowsPlayer"))
-                            {
-                                Directory.Delete(Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)) + "\\LocalLow\\VRChat\\vrchat\\HTTPCache-WindowsPlayer", true);
                             }
+                            break;
+                        case "Cache-WindowsPlayer":
+                            try
+                            {
+                                Directory.Delete(folder, true);
+                            }
+                            catch
+                            {
 
-                            if (Directory.Exists(Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)) + "\\LocalLow\\VRChat\\vrchat\\Unity"))
-                            {
-                                Directory.Delete(Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)) + "\\LocalLow\\VRChat\\vrchat\\Unity", true);
                             }
+                            break;
+                        case "HTTPCache-WindowsPlayer":
+                            try
+                            {
+                                Directory.Delete(folder, true);
+                            }
+                            catch
+                            {
 
-                            if (Directory.Exists(Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)) + "\\LocalLow\\VRChat\\vrchat\\VRCHTTPCache"))
-                            {
-                                Directory.Delete(Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)) + "\\LocalLow\\VRChat\\vrchat\\VRCHTTPCache", true);
                             }
-                        }
+                            break;
+                        case "Unity":
+                            try
+                            {
+                                Directory.Delete(folder, true);
+                            }
+                            catch
+                            {
+
+                            }
+                            break;
+                        case "VRCHTTPCache":
+                            try
+                            {
+                                Directory.Delete(folder, true);
+                            }
+                            catch
+                            {
+
+                            }
+                            break;
                     }
                 }
             }
+        }
+
+        private void AutoDeleteTimer_Tick(object sender, EventArgs e)
+        {
+            ClearVRCCache();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -115,7 +154,7 @@ namespace VRChat_Cache_Auto_Deleter
             else if (IsAdministrator() == false)
             {
                 Enabled = true;
-                MessageBox.Show("This Tool MUST Be Ran As Administrator To Work!");
+                MessageBox.Show("This Tool MUST Be Ran As Administrator For This To Work!");
             }
         }
 
@@ -127,7 +166,7 @@ namespace VRChat_Cache_Auto_Deleter
             }
         }
 
-        static public void CopyFolder(string sourceFolder, string destFolder)
+        public static void CopyFolder(string sourceFolder, string destFolder)
         {
             if (!Directory.Exists(destFolder))
                 Directory.CreateDirectory(destFolder);
@@ -180,7 +219,7 @@ namespace VRChat_Cache_Auto_Deleter
             else
             {
                 Enabled = true;
-                MessageBox.Show("This Tool MUST Be Ran As Administrator To Work!");
+                MessageBox.Show("This Tool MUST Be Ran As Administrator For This To Work!");
             }
         }
 
@@ -191,25 +230,7 @@ namespace VRChat_Cache_Auto_Deleter
                 File.Delete(file);
             }
 
-            if (Directory.Exists(Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)) + "\\LocalLow\\VRChat\\vrchat\\Cookies"))
-            {
-                Directory.Delete(Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)) + "\\LocalLow\\VRChat\\vrchat\\Cookies", true);
-            }
-
-            if (Directory.Exists(Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)) + "\\LocalLow\\VRChat\\vrchat\\HTTPCache-WindowsPlayer"))
-            {
-                Directory.Delete(Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)) + "\\LocalLow\\VRChat\\vrchat\\HTTPCache-WindowsPlayer", true);
-            }
-
-            if (Directory.Exists(Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)) + "\\LocalLow\\VRChat\\vrchat\\Unity"))
-            {
-                Directory.Delete(Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)) + "\\LocalLow\\VRChat\\vrchat\\Unity", true);
-            }
-
-            if (Directory.Exists(Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)) + "\\LocalLow\\VRChat\\vrchat\\VRCHTTPCache"))
-            {
-                Directory.Delete(Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)) + "\\LocalLow\\VRChat\\vrchat\\VRCHTTPCache", true);
-            }
+            ClearVRCCache();
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -218,6 +239,19 @@ namespace VRChat_Cache_Auto_Deleter
             {
                 Directory.Delete(Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)) + "\\LocalLow\\VRChat\\vrchat\\HTTPCache-WindowsPlayer", true);
             }
+        }
+    }
+
+    public static class Extensions
+    {
+        public static long AvailableSpaceInMB(this DriveInfo drive)
+        {
+            return ((drive.TotalSize - drive.AvailableFreeSpace) / 1073741824);
+        }
+
+        public static long AvailableSpaceInGB(this DriveInfo drive)
+        {
+            return ((drive.TotalSize - drive.AvailableFreeSpace) / 1048576);
         }
     }
 }
