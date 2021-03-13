@@ -116,7 +116,13 @@ namespace VRChat_Cache_Auto_Deleter
             {
                 if (Drive.AvailableSpaceInGB() == 5 || (Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)) + "\\LocalLow\\VRChat\\").GetDirectorySizeInGB() > 19) // Drive Space Is Less Than 5GB Or Cache Is Full
                 {
+                    AutoDeleteTimer.Stop();
+                    AutoDeleteTimer.Enabled = false;
+
                     ClearVRCCache();
+
+                    AutoDeleteTimer.Enabled = true;
+                    AutoDeleteTimer.Start();
                 }
             }
         }
