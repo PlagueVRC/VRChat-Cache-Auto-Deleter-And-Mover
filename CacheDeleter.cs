@@ -290,7 +290,7 @@ namespace VRChat_Cache_Auto_Deleter
 
             //Loop on Sub Direcotries in the Current Directory and Calculate it's files size.
             System.Threading.Tasks.Parallel.ForEach(Info.GetDirectories(), (subDirectory) =>
-                    System.Threading.Interlocked.Add(ref startDirectorySize, GetDirectorySizeInGB(subDirectory, recursive)));
+                    System.Threading.Interlocked.Add(ref startDirectorySize, GetDirectorySizeInGB(subDirectory.FullName)));
 
             return startDirectorySize;  //Return full Size of this Directory.
         }
